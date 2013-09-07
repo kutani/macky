@@ -4,7 +4,7 @@
  * See README.md for usage
  *
  * See LICENSE for licensing info
- * 
+ *
  * Written Sept 2013 Kutani
  */
 
@@ -39,7 +39,7 @@ func (s *Server) ReadConf(dir string) error {
 		fmt.Println(err)
 		return err
 	}
-	
+
 	defer f.Close()
 
 	s.path = fmt.Sprint("connections/", dir)
@@ -142,10 +142,11 @@ func (s *Server) WriteOut(in <-chan string) {
 		return
 	}
 
+	defer outfile.Close()
+
 	outbuf := bufio.NewWriter(outfile)
 
 	for {
-
 		out := <-in
 		ret, err := outbuf.WriteString(fmt.Sprintln(out))
 		outbuf.Flush()
@@ -154,9 +155,7 @@ func (s *Server) WriteOut(in <-chan string) {
 			fmt.Println(err)
 			break
 		}
-
 	}
-	outfile.Close()
 }
 
 func (s *Server) Process(output chan<- string) {
@@ -230,7 +229,7 @@ func main() {
 		fmt.Println("connections directory does not exist; please see README.md")
 		return
 	}
-	
+
 	if len(os.Args) <= 1 {
 		fmt.Println("No connection passed; please see README.md")
 		return
