@@ -1,0 +1,8 @@
+{
+	"Address": "server.address.goes.here",
+	"Port": 2069,
+	"TLS": false,
+	"Login": "connect %u %p",
+	"User": "MyUserName",
+	"Pass": "MyPassword"
+}
