@@ -7,17 +7,17 @@ Like ii, interacting with macky is accomplished through filesystem tools.  Comma
 
 It works quite well in acme, for example, using two `win` windows, one reading the `out` file with `tail -f` and the other sending commands with `cat >> in`.
 
-The program expects a certain directory structure, beginning with a `connections` subdirectory.  In this directory, you create additional subdirectories for each separate server account you want to connect to.  These subdirectories are where connection configuration is held (in a `conf` file), and is where the `in` FIFO and `out` files are created by the program.
+The program expects a certain directory structure, beginning with a `connections` subdirectory.  In this directory, you create additional subdirectories for each separate server account you want to connect to.  These subdirectories are where connection configurations are held (in a `conf` file), and are where the `in` FIFO and `out` files are created by the program.
 
 A sample connection configuration is provided.
 
 ## Usage
 
-`./macky [connection-name]`
+Just call `./macky`
 
-Program messages will be sent to stdout; all else is sent to the `out` file, including command echoes.
+Program messages will be sent to stdout; all else is sent to each connection's `out` file, including command echoes.
 
-At present it requires one instance of the program for each connection; this is on the roadmap to be changed.
+Once started, an `in` FIFO will be created in the current directory.  This file responds to two commands: `CTL_CONNECT` and CTL_QUIT.  See Control Messages below for syntax.
 
 ## Configuration
 
@@ -38,10 +38,19 @@ Any `%u` in the string is replaced with the value in the User field, and `%p` is
 
 ## Control Messages
 
-Special commands prefixed with `CTL_` can be written to the `in` file to control macky itself.  At present only one command is implemented: `CTL_QUIT`, which closes the current connection and cleans up leftover FIFOs.
+Special commands prefixed with `CTL_` can be written to the `in` files to control macky itself.
+
+### Program Control
+The program control `in` FIFO, located in the root directory, accepts two commands:
+
+`CTL_CONNECT` is used to connect to configured sessions, and takes as arguments the names for each connection to make.  These arguments should match the name of session directory names under the `connections/` directory.  You can pass multiple names and macky will connect to all of them.
+
+`CTL_QUIT` closes all open connections, cleaning up FIFOs, and quits macky.
+
+### Session Control
+Each session also has it's own `in` FIFO.  In addition to the above commands, these accept the `CTL_CLOSE` command, which will close and clean up only the current session.
 
 ## TODO
 
 * Implement TLS support
-* Support for multiple concurrent connections
 * A modular "rules" system for doing magic with output
